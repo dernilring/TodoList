@@ -1,6 +1,7 @@
 import "./App.css";
 import ToDo from "./ToDo";
 import React from "react";
+import Filters from "./Filters";
 
 class App extends React.Component {
   constructor(props) {
@@ -9,6 +10,10 @@ class App extends React.Component {
       name: "",
       changeColor: false,
       todos: [],
+      isOnlyUndone: false,
+      substring: "",
+      filterTodo: () => true,
+      filters: [],
     };
   }
 
@@ -24,13 +29,9 @@ class App extends React.Component {
   };
 
   handleAddTODO = () => {
-    const todo = {
-      name: this.state.name,
-      done: false,
-    };
     this.setState({
       name: "",
-      todos: this.state.todos.concat([todo]),
+      todos: [...this.state.todos, { name: this.state.name, done: false }],
     });
   };
 
@@ -41,18 +42,42 @@ class App extends React.Component {
       ),
     });
   };
+  handleSetSubstring = (e) => {
+    this.setState({
+      substring: e.target.value,
+    });
+  };
+
+  handleFilterAdd = (key, fn) => {
+    this.setState({
+      filters: [
+        ...this.state.filters.filter((f) => f.key !== key),
+        { key, fn },
+      ],
+    });
+  };
   render() {
+    const { todos, name, isOnlyUndone, substring, filters } = this.state;
     return (
       <div>
-        <input value={this.state.name} onChange={this.handleSetName} />
-        <button
-          className={this.state.changeColor ? "subActive" : "submit"}
-          onClick={this.handleForm}
-        >
-          submit
-        </button>
+        <Filters onFilteredAdd={this.handleFilterAdd} />
         <div>
-          {this.state.todos.map((todo, index) => (
+          <input value={this.state.name} onChange={this.handleSetName} />
+          <button
+            className={this.state.changeColor ? "subActive" : "submit"}
+            onClick={this.handleForm}
+          >
+            submit
+          </button>
+        </div>
+
+        {todos
+          .filter((todo) =>
+            filters
+              .toSorted((a, b) => a.priorirty - b.priority)
+              .every((f) => f.fn(todo))
+          )
+          .map((todo) => (
             <ToDo
               key={index}
               name={todo.name}
@@ -60,7 +85,6 @@ class App extends React.Component {
               onDone={this.handleSetDone}
             />
           ))}
-        </div>
       </div>
     );
   }
