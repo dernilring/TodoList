@@ -35,7 +35,11 @@ class App extends React.Component {
       name: "",
       todos: [
         ...this.state.todos,
-        { name: this.state.name, done: false, id: Date.now() },
+        {
+          name: this.state.name,
+          done: false,
+          id: Date.now(),
+        },
       ],
     });
   };
@@ -89,6 +93,13 @@ class App extends React.Component {
       this.setState({ filteredTodos: filtered });
     }, 300);
   };
+  handleFormatTime = (timestamp) => {
+    const [hours, minutes, seconds] = new Date(timestamp)
+      .toTimeString()
+      .split(" ")[0]
+      .split(":");
+    return `  ${hours}:${minutes}:${seconds}`;
+  };
   render() {
     const { todos, name, isOnlyUndone, substring, filters } = this.state;
     const filteredTodos = todos.filter((todo) =>
@@ -139,7 +150,7 @@ class App extends React.Component {
               key={todo.id}
               name={todo.name}
               done={todo.done}
-              id={todo.id}
+              id={this.handleFormatTime(todo.id)}
               onDone={this.handleSetDone}
               onDelete={this.handleDeleteTodo}
             />
