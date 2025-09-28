@@ -14,6 +14,7 @@ class App extends React.Component {
       substring: "",
       filterTodo: () => true,
       filters: [],
+      isDeleted: false,
     };
     this.debounceTimer = null;
   }
@@ -74,12 +75,17 @@ class App extends React.Component {
       todo.name.toLowerCase().includes(searchValue.target.value.toLowerCase())
     );
   };
+  handleDeleteTodo = (id) => {
+    this.setState({
+      todos: this.state.todos.filter((todo) => todo.id !== id),
+    });
+  };
   useDebounce = (searchValue) => {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
     this.debounceTimer = setTimeout(() => {
-      // const filtered = this.handleSearch(searchValue, this.state.todos);
+      //const filtered = this.handleSearch(searchValue, this.state.todos);
       this.setState({ filteredTodos: filtered });
     }, 300);
   };
@@ -104,7 +110,10 @@ class App extends React.Component {
             <div key={todo.id}>
               {/* <input type="checkbox" checked={todo.done} readOnly /> */}
               <ul className="list">
-                <li> {todo.name}</li>
+                <li>
+                  {" "}
+                  {todo.name} {todo.id}
+                </li>
               </ul>
             </div>
           ))}
@@ -132,6 +141,7 @@ class App extends React.Component {
               done={todo.done}
               id={todo.id}
               onDone={this.handleSetDone}
+              onDelete={this.handleDeleteTodo}
             />
           ))}
       </div>
