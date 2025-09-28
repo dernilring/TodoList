@@ -27,7 +27,6 @@ class App extends React.Component {
     e.preventDefault();
     this.setState({ changeColor: true });
     this.handleAddTODO();
-    console.log("form is sent");
   };
 
   handleAddTODO = () => {
@@ -45,19 +44,23 @@ class App extends React.Component {
   };
 
   handleSetDone = (done, id) => {
-    console.log("Received in handleSetDone:", done, id);
     this.setState({
       todos: this.state.todos.map((todo) =>
         todo.id === id ? { ...todo, done } : todo
       ),
     });
   };
+
   handleSetSubstring = (e) => {
     let searchValue = e.target.value;
     this.setState({
       substring: searchValue,
     });
-    this.useDebounce(searchValue);
+    this.handleUseDebounce(searchValue);
+    this.handleFilterAdd("substring", (todo) => {
+      if (!searchValue) return true;
+      return todo.name.toLowerCase().includes(searchValue.toLowerCase());
+    });
   };
 
   handleFilterAdd = (key, fn) => {
@@ -68,31 +71,32 @@ class App extends React.Component {
       ],
     });
   };
+
   handleSetOnlyUndone = (e) => {
     this.setState({ isOnlyUndone: e.target.checked });
   };
-  handleSetSubstring = (e) => {
-    this.setState({ substring: e.target.value });
-  };
+
   handleSearch = (searchValue, todos) => {
     return todos.filter((todo) =>
       todo.name.toLowerCase().includes(searchValue.target.value.toLowerCase())
     );
   };
+
   handleDeleteTodo = (id) => {
     this.setState({
       todos: this.state.todos.filter((todo) => todo.id !== id),
     });
   };
-  useDebounce = (searchValue) => {
+
+  handleUseDebounce = (searchValue) => {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
     this.debounceTimer = setTimeout(() => {
-      //const filtered = this.handleSearch(searchValue, this.state.todos);
-      this.setState({ filteredTodos: filtered });
+      console.log("Debounced search completed for:", searchValue);
     }, 300);
   };
+
   handleFormatTime = (timestamp) => {
     const [hours, minutes, seconds] = new Date(timestamp)
       .toTimeString()
@@ -100,10 +104,14 @@ class App extends React.Component {
       .split(":");
     return `  ${hours}:${minutes}:${seconds}`;
   };
+
   render() {
     const { todos, name, isOnlyUndone, substring, filters } = this.state;
+
     const filteredTodos = todos.filter((todo) =>
-      todo.name.toLowerCase().includes(substring.toLowerCase())
+      filters
+        .toSorted((a, b) => (a.priority || 0) - (b.priority || 0))
+        .every((f) => f.fn(todo))
     );
     return (
       <div>
@@ -116,20 +124,8 @@ class App extends React.Component {
             onChange={this.handleSetSubstring}
             placeholder="Поиск задач..."
           />
-
-          {filteredTodos.map((todo) => (
-            <div key={todo.id}>
-              {/* <input type="checkbox" checked={todo.done} readOnly /> */}
-              <ul className="list">
-                <li>
-                  {" "}
-                  {todo.name} {todo.id}
-                </li>
-              </ul>
-            </div>
-          ))}
         </div>
-        <div>
+        <div className="enter">
           <input value={this.state.name} onChange={this.handleSetName} />
           <button
             className={this.state.changeColor ? "subActive" : "submit"}
@@ -139,22 +135,16 @@ class App extends React.Component {
           </button>
         </div>
 
-        {todos
-          .filter((todo) =>
-            filters
-              .toSorted((a, b) => a.priority - b.priority)
-              .every((f) => f.fn(todo))
-          )
-          .map((todo) => (
-            <ToDo
-              key={todo.id}
-              name={todo.name}
-              done={todo.done}
-              id={this.handleFormatTime(todo.id)}
-              onDone={this.handleSetDone}
-              onDelete={this.handleDeleteTodo}
-            />
-          ))}
+        {filteredTodos.map((todo) => (
+          <ToDo
+            key={todo.id}
+            name={todo.name}
+            done={todo.done}
+            id={todo.id}
+            onDone={this.handleSetDone}
+            onDelete={this.handleDeleteTodo}
+          />
+        ))}
       </div>
     );
   }

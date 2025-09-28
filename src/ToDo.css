@@ -1,0 +1,28 @@
+.todo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 35px;
+    background-color: rgb(46, 115, 138);
+
+}
+
+.delete {
+    border-radius: 2px;
+    border-width: 2px;
+    text-align: center;
+    height: 25px;
+    margin: 5px;
+    margin-left: auto;
+    color: aliceblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+.delete:hover {
+    border-color: aliceblue;
+
+}

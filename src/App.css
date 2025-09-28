@@ -6,12 +6,36 @@
   color: aliceblue;
 }
 
-.submit {
-  color: beige;
+.enter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
+.submit {
+
+  border-radius: 2px;
+  text-align: center;
+  height: 25px;
+  margin: 5px;
+  color: aliceblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 .subActive {
-  color: rgb(25, 82, 148);
+  color: rgb(46, 115, 138);
+
+  border-radius: 2px;
+  text-align: center;
+  height: 25px;
+  margin: 5px;
+  color: aliceblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .list {

@@ -4,7 +4,7 @@ import React from "react";
 export default class ToDo extends React.Component {
   render() {
     return (
-      <div>
+      <div className="todo">
         <div className={this.props.done ? "done" : ""}>
           <input
             type="checkbox"
@@ -12,7 +12,7 @@ export default class ToDo extends React.Component {
             onChange={this.handleCheck}
           />
           {this.props.name}
-          {this.props.id}
+          {this.handleFormatTime(this.props.id)}
         </div>
         <button
           className="delete"
@@ -26,10 +26,17 @@ export default class ToDo extends React.Component {
 
   handleCheck = (e) => {
     const done = e.target.checked;
-    console.log("ToDo props:", this.props);
+
     this.props.onDone(done, this.props.id);
   };
   handleDeleteTodo = (id) => {
     this.props.onDelete(id);
+  };
+  handleFormatTime = (timestamp) => {
+    const [hours, minutes, seconds] = new Date(timestamp)
+      .toTimeString()
+      .split(" ")[0]
+      .split(":");
+    return `  ${hours}:${minutes}:${seconds}`;
   };
 }
