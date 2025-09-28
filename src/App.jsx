@@ -15,6 +15,7 @@ class App extends React.Component {
       filterTodo: () => true,
       filters: [],
     };
+    this.debounceTimer = null;
   }
 
   handleSetName = (e) => {
@@ -31,21 +32,27 @@ class App extends React.Component {
   handleAddTODO = () => {
     this.setState({
       name: "",
-      todos: [...this.state.todos, { name: this.state.name, done: false }],
+      todos: [
+        ...this.state.todos,
+        { name: this.state.name, done: false, id: Date.now() },
+      ],
     });
   };
 
-  handleSetDone = (done, name) => {
+  handleSetDone = (done, id) => {
+    console.log("Received in handleSetDone:", done, id);
     this.setState({
       todos: this.state.todos.map((todo) =>
-        todo.name === name ? { name, done } : todo
+        todo.id === id ? { ...todo, done } : todo
       ),
     });
   };
   handleSetSubstring = (e) => {
+    let searchValue = e.target.value;
     this.setState({
-      substring: e.target.value,
+      substring: searchValue,
     });
+    this.useDebounce(searchValue);
   };
 
   handleFilterAdd = (key, fn) => {
@@ -56,11 +63,52 @@ class App extends React.Component {
       ],
     });
   };
+  handleSetOnlyUndone = (e) => {
+    this.setState({ isOnlyUndone: e.target.checked });
+  };
+  handleSetSubstring = (e) => {
+    this.setState({ substring: e.target.value });
+  };
+  handleSearch = (searchValue, todos) => {
+    return todos.filter((todo) =>
+      todo.name.toLowerCase().includes(searchValue.target.value.toLowerCase())
+    );
+  };
+  useDebounce = (searchValue) => {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = setTimeout(() => {
+      // const filtered = this.handleSearch(searchValue, this.state.todos);
+      this.setState({ filteredTodos: filtered });
+    }, 300);
+  };
   render() {
     const { todos, name, isOnlyUndone, substring, filters } = this.state;
+    const filteredTodos = todos.filter((todo) =>
+      todo.name.toLowerCase().includes(substring.toLowerCase())
+    );
     return (
       <div>
         <Filters onFilteredAdd={this.handleFilterAdd} />
+
+        <div>
+          <input
+            type="text"
+            value={substring}
+            onChange={this.handleSetSubstring}
+            placeholder="Поиск задач..."
+          />
+
+          {filteredTodos.map((todo) => (
+            <div key={todo.id}>
+              {/* <input type="checkbox" checked={todo.done} readOnly /> */}
+              <ul className="list">
+                <li> {todo.name}</li>
+              </ul>
+            </div>
+          ))}
+        </div>
         <div>
           <input value={this.state.name} onChange={this.handleSetName} />
           <button
@@ -74,14 +122,15 @@ class App extends React.Component {
         {todos
           .filter((todo) =>
             filters
-              .toSorted((a, b) => a.priorirty - b.priority)
+              .toSorted((a, b) => a.priority - b.priority)
               .every((f) => f.fn(todo))
           )
           .map((todo) => (
             <ToDo
-              key={index}
+              key={todo.id}
               name={todo.name}
               done={todo.done}
+              id={todo.id}
               onDone={this.handleSetDone}
             />
           ))}
@@ -95,3 +144,11 @@ export default App;
 //{} - интерполяция
 // onChange{()=>{}} - атрибут , которой передает функцтю
 // setState()
+
+// Пример добавления нового фильтра
+// handleSetFilteredName = (e) => {
+//   const type = 'важная'
+//   this.handleAddFilter('filtertype', (todo) =>
+//     type ? todo.type == type : true
+//   )
+// }

@@ -1,3 +1,5 @@
+import React from "react";
+
 export default class Filters extends React.Component {
   render() {
     return (
@@ -12,7 +14,7 @@ export default class Filters extends React.Component {
   }
 
   handleUndoneFilterChange = (e) => {
-    this.props.onFilterAdd("undone", (todo) =>
+    this.props.onFilteredAdd("undone", (todo) =>
       e.target.checked ? !todo.done : true
     );
 

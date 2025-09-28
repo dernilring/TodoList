@@ -13,3 +13,8 @@
 .subActive {
   color: rgb(25, 82, 148);
 }
+
+.list {
+  list-style-type: none;
+
+}

@@ -17,6 +17,7 @@ export default class ToDo extends React.Component {
 
   handleCheck = (e) => {
     const done = e.target.checked;
-    this.props.onDone(done, this.props.name);
+    console.log("ToDo props:", this.props);
+    this.props.onDone(done, this.props.id);
   };
 }
